@@ -1,10 +1,10 @@
 serviceName : HybridContentService
 
-serviceBaseURL: http://hybridcontent.com/
+serviceBaseURL: http://twomini.net/
 
 authServiceToken: "you-need-a-service-token-valid-for-your-auth-service"
 
-authServiceBaseUrl: http://auth.hybridcontent.com/
+authServiceBaseUrl: http://auth.twomini.net/
 
 assets:
   overrides:

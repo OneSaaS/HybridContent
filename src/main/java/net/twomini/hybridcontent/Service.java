@@ -71,8 +71,8 @@ public class Service extends com.yammer.dropwizard.Service<ServiceConfiguration>
             The third is a String... of roles the user must have, i.e. "roleName" or "roleName1", "roleName2", "roleName3"
          */
         List<AuthUrlRule> urlAuthRules = new ArrayList<AuthUrlRule>();
-        // Th following example rule will block requests to URLs that start with "private" unless logged in by a user having the "privateRole" role
-        urlAuthRules.add(new AuthUrlRule("private", true, "privateRole"));
+        // Th following example rule will block requests to URLs that start with "/secret" unless logged in by a user having the "secretRole" role
+        urlAuthRules.add(new AuthUrlRule("/secret", true, "secretRole"));
 
         /*
             This Authorizer instance is used by both the static files servlet and the service endpoints to verify that the
@@ -92,7 +92,7 @@ public class Service extends com.yammer.dropwizard.Service<ServiceConfiguration>
             using the DummyProvider.
          */
         //environment.addProvider(new AuthServiceProvider<AuthCaller>(cachingAuthenticator, authorizer, configuration.getServiceBaseURL(), configuration.getAuthServiceBaseUrl()));
-        environment.addProvider(new DummyProvider<AuthCaller>());
+        environment.addProvider(new DummyProvider<AuthCaller>(authorizer, configuration.getServiceBaseURL(), configuration.getAuthServiceBaseUrl()));
 
 
         /*
