@@ -46,7 +46,7 @@ public class Service extends com.yammer.dropwizard.Service<ServiceConfiguration>
 
             You can create your own Filter to work with other load balancers, or to embody your own custom logic.
         */
-        environment.addFilter(new Ec2ElbHttpsRedirectFilter(), "/*");
+//        environment.addFilter(new Ec2ElbHttpsRedirectFilter(), "/*");
 
 
         /*
