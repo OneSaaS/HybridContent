@@ -5,8 +5,8 @@ import com.yammer.dropwizard.auth.Authenticator;
 import com.yammer.dropwizard.config.Environment;
 import net.twomini.hybridcontent.auth.AuthCaller;
 import net.twomini.hybridcontent.auth.Authorizer;
+import net.twomini.hybridcontent.auth.HttpRequestDetails;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -94,7 +94,7 @@ public class AssetsServletFactory {
         this.cacheBuilderSpec = cacheBuilderSpec;
     }
 
-    public void addNewAssetServletToEnvironment(Environment environment, AssetsConfiguration config, Authenticator<HttpServletRequest,AuthCaller> authenticator, Authorizer authorizer, String authServiceBaseUrl, String serviceBaseURL) {
+    public void addNewAssetServletToEnvironment(Environment environment, AssetsConfiguration config, Authenticator<HttpRequestDetails,AuthCaller> authenticator, Authorizer authorizer, String authServiceBaseUrl, String serviceBaseURL) {
         // Let the cache spec from the configuration override the one specified in the code
         CacheBuilderSpec spec = (config.getCacheSpec() != null)
                 ? CacheBuilderSpec.parse(config.getCacheSpec())

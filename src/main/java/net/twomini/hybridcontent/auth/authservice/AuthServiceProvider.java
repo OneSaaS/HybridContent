@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import net.twomini.hybridcontent.auth.AuthCaller;
 import net.twomini.hybridcontent.auth.AuthRequirements;
 import net.twomini.hybridcontent.auth.Authorizer;
+import net.twomini.hybridcontent.auth.HttpRequestDetails;
 import net.twomini.hybridcontent.auth.exception.AuthLoginRequiredException;
 import net.twomini.hybridcontent.auth.exception.AuthPermissionDeniedException;
 import com.sun.jersey.api.core.HttpContext;
@@ -54,11 +55,11 @@ public class AuthServiceProvider<T> implements InjectableProvider<AuthRequiremen
 
     private static class AuthServiceHttpContextInjectable<T> extends AbstractHttpContextInjectable<T> {
 
-        private final Authenticator<HttpContext, T> authenticator;
+        private final Authenticator<HttpRequestDetails, T> authenticator;
         private final Authorizer authorizer;
         private final AuthRequirements authRequirements;
 
-        private AuthServiceHttpContextInjectable(Authenticator<HttpContext, T> authenticator, Authorizer authorizer, AuthRequirements authRequirements) {
+        private AuthServiceHttpContextInjectable(Authenticator<HttpRequestDetails, T> authenticator, Authorizer authorizer, AuthRequirements authRequirements) {
             this.authenticator = authenticator;
             this.authorizer = authorizer;
             this.authRequirements = authRequirements;
@@ -67,7 +68,14 @@ public class AuthServiceProvider<T> implements InjectableProvider<AuthRequiremen
         @Override
         public T getValue(HttpContext c) {
             try {
-                final Optional<T> result = authenticator.authenticate(c);
+                HttpRequestDetails httpDetails = new HttpRequestDetails();
+                for (String cookieName : c.getRequest().getCookies().keySet()) {
+                    httpDetails.cookies.put(cookieName, c.getRequest().getCookies().get(cookieName).getValue());
+                }
+                for (String headerName : c.getRequest().getRequestHeaders().keySet()) {
+                    httpDetails.headers.put(headerName, c.getRequest().getHeaderValue(headerName));
+                }
+                final Optional<T> result = authenticator.authenticate(httpDetails);
                 AuthCaller caller = (result.isPresent())?(AuthCaller)result.get():null;
                 //This will throw exceptions if the caller isn't authorized
                 authorizer.authorize(caller, authRequirements);
@@ -105,10 +113,10 @@ public class AuthServiceProvider<T> implements InjectableProvider<AuthRequiremen
 
     }
 
-    private final Authenticator<HttpContext, T> authenticator;
+    private final Authenticator<HttpRequestDetails, T> authenticator;
     private final Authorizer authorizer;
 
-    public AuthServiceProvider(Authenticator<HttpContext, T> authenticator, Authorizer authorizer, String serviceBaseURL, String authServiceBaseURL) {
+    public AuthServiceProvider(Authenticator<HttpRequestDetails, T> authenticator, Authorizer authorizer, String serviceBaseURL, String authServiceBaseURL) {
         this.authenticator = authenticator;
         this.authorizer = authorizer;
         this.serviceBaseURL = serviceBaseURL;

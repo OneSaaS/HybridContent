@@ -61,8 +61,8 @@ public class Service extends com.yammer.dropwizard.Service<ServiceConfiguration>
             which Always returns that the user is not logged in.  When using the AuthService, you will want to uncomment
             the first line using the AuthServiceAuthenticator, and comment the second using the DummyAuthenticator.
          */
-        //Authenticator<HttpServletRequest, AuthCaller> cachingAuthenticator = new AuthServiceAuthenticator(configuration.getAuthServiceBaseUrl(), configuration.getAuthServiceToken(), httpClient);
-        Authenticator<HttpServletRequest, AuthCaller> cachingAuthenticator = new DummyAuthenticator();
+//        Authenticator<HttpRequestDetails, AuthCaller> cachingAuthenticator = new AuthServiceAuthenticator(configuration.getAuthServiceBaseUrl(), configuration.getAuthServiceToken(), httpClient);
+        Authenticator<HttpRequestDetails, AuthCaller> cachingAuthenticator = new DummyAuthenticator();
 
         /*
             This is a list of rules used to secure static files being served through this service.
@@ -91,7 +91,7 @@ public class Service extends com.yammer.dropwizard.Service<ServiceConfiguration>
             When using the Auth Service, uncomment the first line, using the AuthServiceProvider, and comment out the second
             using the DummyProvider.
          */
-        //environment.addProvider(new AuthServiceProvider<AuthCaller>(cachingAuthenticator, authorizer, configuration.getServiceBaseURL(), configuration.getAuthServiceBaseUrl()));
+//        environment.addProvider(new AuthServiceProvider<AuthCaller>(cachingAuthenticator, authorizer, configuration.getServiceBaseURL(), configuration.getAuthServiceBaseUrl()));
         environment.addProvider(new DummyProvider<AuthCaller>(authorizer, configuration.getServiceBaseURL(), configuration.getAuthServiceBaseUrl()));
 
 

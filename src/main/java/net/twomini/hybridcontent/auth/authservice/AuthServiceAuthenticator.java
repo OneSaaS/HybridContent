@@ -5,18 +5,17 @@ import com.google.common.base.Optional;
 import com.yammer.dropwizard.auth.AuthenticationException;
 import com.yammer.dropwizard.auth.Authenticator;
 import net.twomini.hybridcontent.auth.AuthCaller;
+import net.twomini.hybridcontent.auth.HttpRequestDetails;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
-public class AuthServiceAuthenticator implements Authenticator<HttpServletRequest, AuthCaller> {
+public class AuthServiceAuthenticator implements Authenticator<HttpRequestDetails, AuthCaller> {
 
     private static final Logger L = LoggerFactory.getLogger(AuthServiceAuthenticator.class);
 
@@ -31,16 +30,9 @@ public class AuthServiceAuthenticator implements Authenticator<HttpServletReques
     }
 
     @Override
-    public Optional<AuthCaller> authenticate(HttpServletRequest req) throws AuthenticationException {
-        Cookie[] cookies = req.getCookies();
-        Cookie userCookie = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("authUser")) {
-                userCookie = cookie;
-            }
-        }
-        final String userToken = (userCookie != null)?userCookie.getValue():null;
-        final String serviceToken = req.getHeader("authService");
+    public Optional<AuthCaller> authenticate(HttpRequestDetails req) throws AuthenticationException {
+        final String userToken = req.cookies.get("authUser");
+        final String serviceToken = req.headers.get("authService");
 
         if (userToken != null || serviceToken != null) {
 

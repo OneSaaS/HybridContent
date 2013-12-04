@@ -17,6 +17,7 @@ import com.yammer.dropwizard.auth.AuthenticationException;
 import com.yammer.dropwizard.auth.Authenticator;
 import net.twomini.hybridcontent.auth.AuthCaller;
 import net.twomini.hybridcontent.auth.Authorizer;
+import net.twomini.hybridcontent.auth.HttpRequestDetails;
 import net.twomini.hybridcontent.auth.exception.AuthLoginRequiredException;
 import net.twomini.hybridcontent.auth.exception.AuthPermissionDeniedException;
 import org.eclipse.jetty.http.MimeTypes;
@@ -24,6 +25,7 @@ import org.eclipse.jetty.io.Buffer;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +35,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -49,7 +52,7 @@ class AssetServlet extends HttpServlet {
     private final transient LoadingCache<String, Asset> cache;
     private final transient MimeTypes mimeTypes;
 
-    private final Authenticator<HttpServletRequest,AuthCaller> authenticator;
+    private final Authenticator<HttpRequestDetails,AuthCaller> authenticator;
     private final Authorizer authorizer;
 
 
@@ -75,7 +78,7 @@ class AssetServlet extends HttpServlet {
      */
     public AssetServlet(String resourcePath, CacheBuilderSpec spec, String uriPath, String indexFile,
                         Iterable<Map.Entry<String, String>> overrides,
-                        Authenticator<HttpServletRequest,AuthCaller> authenticator, Authorizer authorizer,
+                        Authenticator<HttpRequestDetails,AuthCaller> authenticator, Authorizer authorizer,
                         String authServiceBaseUrl, String serviceBaseURL) {
         AssetLoader loader = new AssetLoader(resourcePath, uriPath, indexFile, overrides);
         this.cache = CacheBuilder.from(spec).weigher(new AssetSizeWeigher()).build(loader);
@@ -104,7 +107,7 @@ class AssetServlet extends HttpServlet {
      */
     public AssetServlet(String resourcePath, CacheBuilderSpec spec, String uriPath,
                         Iterable<Map.Entry<String, String>> overrides,
-                        Authenticator<HttpServletRequest,AuthCaller> authenticator, Authorizer authorizer,
+                        Authenticator<HttpRequestDetails,AuthCaller> authenticator, Authorizer authorizer,
                         String authServiceBaseUrl, String serviceBaseURL) {
         this(resourcePath, spec, uriPath, DEFAULT_INDEX_FILE, overrides, authenticator, authorizer, authServiceBaseUrl, serviceBaseURL);
     }
@@ -116,7 +119,14 @@ class AssetServlet extends HttpServlet {
 
             //Check Security
             try {
-                final Optional<AuthCaller> optionalCaller = authenticator.authenticate(req);
+                HttpRequestDetails httpDetails = new HttpRequestDetails();
+                for (Cookie cookie : req.getCookies()) {
+                    httpDetails.cookies.put(cookie.getName(), cookie.getValue());
+                }
+                for (String headerName : Collections.list(req.getHeaderNames())) {
+                    httpDetails.headers.put(headerName, req.getHeader(headerName));
+                }
+                final Optional<AuthCaller> optionalCaller = authenticator.authenticate(httpDetails);
                 AuthCaller caller = (optionalCaller.isPresent())?(AuthCaller)optionalCaller.get():null;
                 //This will throw exceptions if the caller isn't authorized
                 authorizer.authorize(caller, req.getRequestURI());

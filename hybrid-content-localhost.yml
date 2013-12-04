@@ -1,14 +1,14 @@
 serviceName : HybridContentService
 
-serviceBaseURL: http://twomini.net/
+serviceBaseURL: http://www.me.com/
 
 authServiceToken: "e61fbd14-98b0-4a7e-81cc-ef8e5367845f-5afc3b56-bb1b-4f48-9e41-94a49915f113"
 
-authServiceBaseUrl: http://auth.twomini.net/
+authServiceBaseUrl: http://auth.me.com/
 
 assets:
   overrides:
-    /: /folder/where/my/static/files/are/outside/of/this/project # path to your static files folder, outside of this project
+    /: /home/ubuntu/Services/TwoMini/HybridContent/public # path to your static files folder, outside of this project
 
 http :
   rootPath: "/service/*"
