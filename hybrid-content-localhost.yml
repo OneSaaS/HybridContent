@@ -2,7 +2,7 @@ serviceName : HybridContentService
 
 serviceBaseURL: http://twomini.net/
 
-authServiceToken: "you-need-a-service-token-valid-for-your-auth-service"
+authServiceToken: "e61fbd14-98b0-4a7e-81cc-ef8e5367845f-5afc3b56-bb1b-4f48-9e41-94a49915f113"
 
 authServiceBaseUrl: http://auth.twomini.net/
 

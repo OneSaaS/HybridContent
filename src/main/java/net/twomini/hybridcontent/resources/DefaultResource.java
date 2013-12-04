@@ -28,11 +28,11 @@ public class DefaultResource {
         return new TestResponse((caller!=null)?caller.getUserName():null); // returns this object encoded as JSON
     }
 
-    @Path("secureTestEndPoint")
+    @Path("secretTestEndPoint")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
     @CacheControl(maxAge = 0, mustRevalidate = true, noCache = true, isPrivate = true, noStore = true, noTransform = true)
-    public TestResponse secureTestEndPoint(@AuthRequirements(requireRoles = {"tester"}) AuthCaller caller) {
+    public TestResponse secureTestEndPoint(@AuthRequirements(requireRoles = {"secretRole"}) AuthCaller caller) {
         return new TestResponse((caller!=null)?caller.getUserName():null); // returns this object encoded as JSON
     }
 
